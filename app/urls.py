@@ -12,4 +12,5 @@ urlpatterns = [
     path('change-password/', ChangePasswordView.as_view()),
     path('auth-one/', AuthOne.as_view()),
     path('auth-two/', AuthTwo.as_view()),
+    path('send-mail/', send_mail_page)
 ]

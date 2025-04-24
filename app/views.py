@@ -12,6 +12,10 @@ from app import methods
 import datetime
 import random
 import uuid
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 class Main(METHODISM):
@@ -158,3 +162,28 @@ class AuthTwo(APIView):
         return Response({
             "message": True
         })
+
+
+def send_mail_page(request):
+    context = {}
+
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+
+        if address and subject and message:
+            try:
+                if '@gmail.com' == address[-10:]:
+                    send_mail(subject, message, settings.EMAIL_HOST_USER, [address])
+                    print("email")
+                    context['message'] = "Emailga jo'natildi"
+                else:
+                    print(message)
+                    context['message'] = 'Raqamga kod yuborildi'
+            except Exception as e:
+                context['message'] = f'Xatolik: {e}'
+        else:
+            context['message'] = 'Hamma bolimlarni toldiring'
+
+    return render(request, "index.html", context)
