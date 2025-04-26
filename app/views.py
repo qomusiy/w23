@@ -29,7 +29,7 @@ class RegisterAPIView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Muvaffaqiyatli"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Muvaffaqiyatli Registratsiya!"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -42,7 +42,7 @@ class LoginAPIView(APIView):
             token, created = Token.objects.get_or_create(user=user)
 
             return Response({
-                "message": "Muvaffaqiyatli",
+                "message": "Muvaffaqiyatli Login!",
                 "token": token.key
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -53,10 +53,11 @@ class LogoutAPIView(APIView):
 
     def post(self, request):
         logout(request)
-        return Response({"message": "Muvaffaqiyatli"}, status=status.HTTP_200_OK)
+        return Response({"message": "Muvaffaqiyatli Logout"}, status=status.HTTP_200_OK)
 
 
 class ProfileAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -91,7 +92,7 @@ class ProfileDeleteAPIView(APIView):
     def delete(self, request):
         user = request.user
         user.delete()
-        return Response({"message": "Akkount o'chirildi"}, status=status.HTTP_200_OK)
+        return Response({"message": "Akkount ajoyib tarzda o'chirildi"}, status=status.HTTP_200_OK)
 
 
 class ChangePasswordView(APIView):
@@ -147,25 +148,43 @@ class AuthOne(APIView):
 class AuthTwo(APIView):
     def post(self, request):
         data = request.data
-        if not data['code'] or not data['key']:
+
+        code = data.get('code')
+        key = data.get('key')
+
+        if not code or not key:
             return Response({
                 "error": "Malumotlarni to'liq kiriting!"
-            })
-        otp = OTP.objects.filter(key=data['key']).first()
+            }, status=400)
+
+        otp = OTP.objects.filter(key=key).first()
 
         if not otp:
             return Response({
-                "Error": "Xato key"
-            })
+                "error": "Xato key"
+            }, status=400)
 
-        now = datetime.datetime.now()
+        if not otp.key.startswith(code):
+            return Response({
+                "error": "Kod noto'g'ri!"
+            }, status=400)
+
+        # OPTIONAL: check expiration (for example 5 minutes)
+        # if datetime.datetime.now() - otp.created_at > datetime.timedelta(minutes=5):
+        #     return Response({
+        #         "error": "Kod muddati tugagan"
+        #     }, status=400)
+
+        otp.delete()
+
         return Response({
-            "message": True
-        })
-
+            "message": "Tasdiqlandi ✅"
+        }, status=200)
 
 def send_mail_page(request):
     context = {}
+
+
 
     if request.method == 'POST':
         address = request.POST.get('address')

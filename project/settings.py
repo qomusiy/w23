@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'app',
     'rest_framework.authtoken',
     'rest_framework',
+
+    # 'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -116,5 +119,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'baxshilloyevferuz23@gmail.com'
+EMAIL_HOST_USER = 'humoyunmahmudjinov@gmail.com'
 EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+### the postman link https://documenter.getpostman.com/view/44281443/2sB2j1gBhZ
