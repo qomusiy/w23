@@ -1,23 +1,29 @@
 from rest_framework import status, permissions
-from methodism import custom_response
+from methodism import custom_response, error_messages, MESSAGE
 
 from app.models import CustomUser
 from app.serializers import RegisterSerializer, UserSerializer
+from rest_framework.authtoken.models import Token
 
 
 def register(request, params):
-    serializer = RegisterSerializer(data=params)
-    if serializer.is_valid():
-        serializer.save()
-        return custom_response({"message": "Muvaffaqiyatli"}, status=status.HTTP_201_CREATED)
-    return custom_response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # serializer = RegisterSerializer(data=params)
+    # if serializer.is_valid():
+    #     serializer.save()
+    #     return custom_response({"message": "Muvaffaqiyatli"}, status=status.HTTP_201_CREATED)
+    # return custom_response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return {"message": "Muvaffaqiyatli"} 
 
 
 def login(request, params):
+    if 'phone' not in params:
+        return custom_response(False, error_messages.error_params_unfilled('phone'))
     user = CustomUser.objects.filter(phone=params['phone']).first()
+    token, created = Token.objects.get_or_create(user=user)
+    
     if not user:
-        return custom_response({"message": "Foydalanuvchi topilmadi"})
-    return custom_response({"message": "login qilindi"})
+        return custom_response(status=False, message=MESSAGE['UserPasswordError'])
+    return custom_response(status=True, data={"token": token.key}, message={"nimadur":'karoche oxshadi'})
 
 
 def logout(request, params):

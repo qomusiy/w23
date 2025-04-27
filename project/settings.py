@@ -123,4 +123,6 @@ EMAIL_HOST_USER = 'humoyunmahmudjinov@gmail.com'
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+APP_NAME = 'drf translate'
+
 ### the postman link https://documenter.getpostman.com/view/44281443/2sB2j1gBhZ
